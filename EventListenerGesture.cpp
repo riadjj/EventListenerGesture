@@ -10,14 +10,15 @@
 
 using namespace cocos2d;
 
-constexpr float DefaultLongTapThresholdSeconds = 0.1f;
-constexpr float DefaultSwipeThresholdDistance = 10.0f;
+constexpr float DefaultLongTapThresholdSeconds = 1.0f;
+constexpr float DefaultSwipeThresholdDistance = 150.0f;
 
 EventListenerGesture::EventListenerGesture()
 : _longTapThresholdSeconds(DefaultLongTapThresholdSeconds)
 , _swipeThresholdDistance(DefaultSwipeThresholdDistance)
 , onTap(nullptr)
 , onLongTapBegan(nullptr)
+, onLongTapMoved(nullptr)
 , onLongTapEnded(nullptr)
 , onSwipe(nullptr)
 , _gestureType(GestureType::NONE)
@@ -63,6 +64,8 @@ bool EventListenerGesture::init()
     {
         if(_gestureType != GestureType::NONE)
         {
+            if(_gestureType == GestureType::LONG_TAP)
+                if(onLongTapMoved) onLongTapMoved(touch->getLocation());
             return;
         }
 
@@ -95,11 +98,11 @@ bool EventListenerGesture::init()
     {
         if(_gestureType == GestureType::NONE)
         {
-            if(onTap) onTap(touch->getDelta());
+            if(onTap) onTap(_touchNowPos);
         }
         else if(_gestureType == GestureType::LONG_TAP)
         {
-            if(onLongTapEnded) onLongTapEnded(touch->getDelta());
+            if(onLongTapEnded) onLongTapEnded(_touchNowPos);
         }
 
         Director::getInstance()->getScheduler()->
@@ -133,7 +136,7 @@ void EventListenerGesture::setLongTapThreshouldSeconds(const float& threshould)
     }
     else
     {
-        CCLOGWARN("EventListenerGesture::LongTapThreshouldTime can set over 0.0f!");
+        _longTapThresholdSeconds = DefaultLongTapThresholdSeconds;
     }
 }
 
@@ -145,7 +148,7 @@ void EventListenerGesture::setSwipeThreshouldDistance(const float& threshould)
     }
     else
     {
-        CCLOGWARN("EventListenerGesture::setSwipeThreshouldDistance can set over 0.0f!");
+        _swipeThresholdDistance = DefaultSwipeThresholdDistance;
     }
 }
 
@@ -169,6 +172,7 @@ EventListenerGesture* EventListenerGesture::clone()
 
         ret->onTap = onTap;
         ret->onLongTapBegan = onLongTapBegan;
+        ret->onLongTapMoved = onLongTapMoved;
         ret->onLongTapEnded = onLongTapEnded;
         ret->onSwipe = onSwipe;
 
