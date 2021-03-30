@@ -16,6 +16,8 @@ listener->setSwipeThreshouldDistance(150.0f);
 listener->onTap = [](Vec2 vec2){log("onTap called.");};
 listener->onLongTapBegan = [](Vec2 vec2){log("onLongTapBegan called.");};
 listener->onLongTapEnded = [](Vec2 vec2){log("onLongTapEnded called.");};
+//add onLongTapMoved
+listener->onLongTapMoved = [](Vec2 vec2){log("onLongTapMoved called.");};
 listener->onSwipe = [](EventListenerGesture::SwipeDirection direction)
 {
    switch (direction) {
